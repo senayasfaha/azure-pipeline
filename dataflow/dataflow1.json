@@ -24,6 +24,20 @@
 						"type": "DatasetReference"
 					},
 					"name": "realisticustomers"
+				},
+				{
+					"dataset": {
+						"referenceName": "AzurePostgreSqlTable1",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				},
+				{
+					"dataset": {
+						"referenceName": "AzurePostgreSqlTable2",
+						"type": "DatasetReference"
+					},
+					"name": "source3"
 				}
 			],
 			"sinks": [],
@@ -55,7 +69,28 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     format: 'document') ~> realisticustomers"
+				"     format: 'document') ~> realisticustomers",
+				"source(output(",
+				"          orderid as integer,",
+				"          customerid as integer,",
+				"          orderdate as timestamp,",
+				"          paymentstatus as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source2",
+				"source(output(",
+				"          orderdetailid as integer,",
+				"          orderid as integer,",
+				"          productid as integer,",
+				"          quantity as integer,",
+				"          price as decimal(10,2)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source3"
 			]
 		}
 	}
