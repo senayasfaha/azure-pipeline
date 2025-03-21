@@ -30,18 +30,31 @@
 						"referenceName": "AzurePostgreSqlTable1",
 						"type": "DatasetReference"
 					},
-					"name": "source2"
+					"name": "orders"
 				},
 				{
 					"dataset": {
 						"referenceName": "AzurePostgreSqlTable2",
 						"type": "DatasetReference"
 					},
-					"name": "source3"
+					"name": "orderdetail"
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "phoneNumberCleaning",
+					"description": "Creating new column with formatted phone number"
+				},
+				{
+					"name": "emails",
+					"description": "Creating columns for emails"
+				},
+				{
+					"name": "phoneNumber",
+					"description": "Creating new column with formatted phone number"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          CustomerID as string,",
@@ -79,7 +92,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> source2",
+				"     format: 'table') ~> orders",
 				"source(output(",
 				"          orderdetailid as integer,",
 				"          orderid as integer,",
@@ -90,7 +103,16 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> source3"
+				"     format: 'table') ~> orderdetail",
+				"source1 derive(Phone = iif(",
+				"    length(replace(replace(replace(replace(Phone, \"(\", \"\"), \")\", \"\"), \"-\", \"\"), \" \", \"\")) == 10, ",
+				"    replace(replace(replace(replace(Phone, \"(\", \"\"), \")\", \"\"), \"-\", \"\"), \" \", \"\"), ",
+				"    ''",
+				")",
+				") ~> phoneNumberCleaning",
+				"realisticustomers derive(Profile = Profile.Email) ~> emails",
+				"phoneNumberCleaning derive(Phone = \"(\" + substring(Phone, 0, 3) + \") \" + substring(Phone, 3, 3) + \"-\" + substring(Phone, 6, 4)",
+				") ~> phoneNumber"
 			]
 		}
 	}
