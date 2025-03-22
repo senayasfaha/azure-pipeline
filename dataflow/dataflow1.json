@@ -61,6 +61,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "alternativeEmailSink"
+				},
+				{
+					"dataset": {
+						"referenceName": "convo",
+						"type": "DatasetReference"
+					},
+					"name": "conversationInfo"
 				}
 			],
 			"transformations": [
@@ -95,6 +102,9 @@
 				},
 				{
 					"name": "selectConversations"
+				},
+				{
+					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -215,6 +225,12 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> selectConversations",
+				"selectConversations select(mapColumn(",
+				"          CustomerID,",
+				"          converstationId",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
 				"renaming sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -228,6 +244,7 @@
 				"     insertable:false,",
 				"     updateable:false,",
 				"     upsertable:true,",
+				"     keys:['CustomerID'],",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> customerInfoSink",
@@ -244,6 +261,7 @@
 				"     insertable:false,",
 				"     updateable:false,",
 				"     upsertable:true,",
+				"     keys:['orderId'],",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> orderSink",
@@ -258,9 +276,24 @@
 				"     insertable:false,",
 				"     updateable:false,",
 				"     upsertable:true,",
+				"     keys:['customerID'],",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> alternativeEmailSink"
+				"     skipDuplicateMapOutputs: true) ~> alternativeEmailSink",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          conversation_id as integer,",
+				"          customer_id as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['CustomerID'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> conversationInfo"
 			]
 		}
 	}

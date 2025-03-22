@@ -1,0 +1,27 @@
+{
+	"name": "convo",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SqlServer",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "conversation_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "customer_id",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "conversations"
+		}
+	}
+}
