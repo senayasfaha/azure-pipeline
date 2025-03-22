@@ -68,6 +68,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "conversationInfo"
+				},
+				{
+					"dataset": {
+						"referenceName": "SqlServerTable5",
+						"type": "DatasetReference"
+					},
+					"name": "messageInfo"
 				}
 			],
 			"transformations": [
@@ -293,7 +300,25 @@
 				"     keys:['CustomerID'],",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> conversationInfo"
+				"     skipDuplicateMapOutputs: true) ~> conversationInfo",
+				"selectConversations sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          message_id as integer,",
+				"          conversation_id as integer,",
+				"          support_agent as string,",
+				"          message_sender as string,",
+				"          message as string,",
+				"          timestamp as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['CustomerID'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> messageInfo"
 			]
 		}
 	}
