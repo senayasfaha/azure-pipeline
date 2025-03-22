@@ -43,10 +43,24 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "SqlServerTable1",
+						"referenceName": "SqlServerTable3",
 						"type": "DatasetReference"
 					},
 					"name": "customerInfoSink"
+				},
+				{
+					"dataset": {
+						"referenceName": "SqlServerTable2",
+						"type": "DatasetReference"
+					},
+					"name": "orderSink"
+				},
+				{
+					"dataset": {
+						"referenceName": "SqlServerTable4",
+						"type": "DatasetReference"
+					},
+					"name": "alternativeEmailSink"
 				}
 			],
 			"transformations": [
@@ -204,6 +218,22 @@
 				"renaming sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
+				"          customer_id as integer,",
+				"          first_name as string,",
+				"          last_name as string,",
+				"          primary_email as string,",
+				"          phone_number as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> customerInfoSink",
+				"orderSelect sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
 				"          order_id as integer,",
 				"          customer_id as integer,",
 				"          payment_status as string,",
@@ -216,7 +246,21 @@
 				"     upsertable:false,",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> customerInfoSink"
+				"     skipDuplicateMapOutputs: true) ~> orderSink",
+				"fetchingAlternativeEmailInfo sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          alternate_email_id as integer,",
+				"          customer_id as integer,",
+				"          email_address as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> alternativeEmailSink"
 			]
 		}
 	}
