@@ -112,6 +112,21 @@
 				},
 				{
 					"name": "select1"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "AlterRow2"
+				},
+				{
+					"name": "AlterRow3"
+				},
+				{
+					"name": "AlterRow4"
+				},
+				{
+					"name": "AlterRow5"
 				}
 			],
 			"scriptLines": [
@@ -238,7 +253,12 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"renaming sink(allowSchemaDrift: true,",
+				"renaming alterRow(upsertIf(true())) ~> AlterRow1",
+				"orderSelect alterRow(upsertIf(true())) ~> AlterRow2",
+				"selectConversations alterRow(upsertIf(true())) ~> AlterRow3",
+				"select1 alterRow(upsertIf(true())) ~> AlterRow4",
+				"fetchingAlternativeEmailInfo alterRow(upsertIf(true())) ~> AlterRow5",
+				"AlterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          customer_id as integer,",
@@ -255,7 +275,7 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> customerInfoSink",
-				"orderSelect sink(allowSchemaDrift: true,",
+				"AlterRow2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          order_id as integer,",
@@ -272,7 +292,7 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> orderSink",
-				"fetchingAlternativeEmailInfo sink(allowSchemaDrift: true,",
+				"AlterRow5 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          alternate_email_id as integer,",
@@ -287,7 +307,7 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> alternativeEmailSink",
-				"select1 sink(allowSchemaDrift: true,",
+				"AlterRow4 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          conversation_id as integer,",
@@ -301,7 +321,7 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> conversationInfo",
-				"selectConversations sink(allowSchemaDrift: true,",
+				"AlterRow3 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          message_id as integer,",
