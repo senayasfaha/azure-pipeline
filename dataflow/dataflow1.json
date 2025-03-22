@@ -26,6 +26,10 @@
 					"name": "realisticustomers"
 				},
 				{
+					"dataset": {
+						"referenceName": "AzurePostgreSqlTable1",
+						"type": "DatasetReference"
+					},
 					"name": "orders"
 				},
 				{
@@ -68,7 +72,7 @@
 					"name": "orderSelect"
 				},
 				{
-					"name": "select1"
+					"name": "selectConversations"
 				}
 			],
 			"scriptLines": [
@@ -99,8 +103,16 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'document') ~> realisticustomers",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> orders",
+				"source(output(",
+				"          orderid as integer,",
+				"          customerid as integer,",
+				"          orderdate as timestamp,",
+				"          paymentstatus as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> orders",
 				"source(output(",
 				"          orderdetailid as integer,",
 				"          orderid as integer,",
@@ -153,13 +165,9 @@
 				"CalculatingOrderTotal select(mapColumn(",
 				"          orderId = orders@orderid,",
 				"          customerId = customerid,",
+				"          orderTotal = price,",
 				"          date = orderdate,",
-				"          paymentStatus = paymentstatus,",
-				"          orderdetailid,",
-				"          orderid,",
-				"          productid,",
-				"          quantity,",
-				"          price",
+				"          paymentStatus = paymentstatus",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> orderSelect",
@@ -171,7 +179,7 @@
 				"          timeStamp = Conversations[1].Messages[1].DateTime",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1"
+				"     skipDuplicateMapOutputs: true) ~> selectConversations"
 			]
 		}
 	}
