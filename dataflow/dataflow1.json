@@ -40,7 +40,15 @@
 					"name": "orderdetail"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SqlServerTable1",
+						"type": "DatasetReference"
+					},
+					"name": "customerInfoSink"
+				}
+			],
 			"transformations": [
 				{
 					"name": "phoneNumberCleaning",
@@ -57,7 +65,7 @@
 					"name": "extractingUserData"
 				},
 				{
-					"name": "renameing"
+					"name": "renaming"
 				},
 				{
 					"name": "fetchingAlternativeEmailInfo"
@@ -131,14 +139,27 @@
 				")) ~> phoneNumberCleaning",
 				"phoneNumberCleaning derive(Phone = \"(\" + substring(Phone, 0, 3) + \") \" + substring(Phone, 3, 3) + \"-\" + substring(Phone, 6, 4),",
 				"          CustomerID = toInteger(CustomerID)) ~> phoneNumber",
-				"phoneNumber, realisticustomers join(select1@CustomerID == realisticustomers@CustomerID,",
+				"phoneNumber, realisticustomers join(phoneNumber@CustomerID == realisticustomers@CustomerID,",
 				"     joinType:'outer',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinHitoricalAndCurrentDate",
-				"joinHitoricalAndCurrentDate derive(CustomerID = iif(isNull(realisticustomers@CustomerID), select1@CustomerID, realisticustomers@CustomerID),",
-				"          Name = iif(isNull(Profile.FirstName), Name, Profile.FirstName),",
-				"          Profile = iif(isNull(Profile.LastName), Name, Profile.LastName),",
+				"joinHitoricalAndCurrentDate derive(CustomerID = iif(isNull(realisticustomers@CustomerID), phoneNumber@CustomerID, realisticustomers@CustomerID),",
+				"          Name = /* iif(isNull(Profile.FirstName), Name, Profile.FirstName) */",
+				"",
+				"iif(",
+				"  isNull(Profile.FirstName),",
+				"  split(Name, ' ')[0],",
+				"  Profile.FirstName",
+				")",
+				",",
+				"          Profile = /* iif(isNull(Profile.LastName), Name, Profile.LastName) */",
+				"",
+				"iif(",
+				"  isNull(Profile.LastName),",
+				"  split(Name, ' ')[0],",
+				"  Profile.LastName",
+				"),",
 				"          Email = iif(isNull(Profile.Email), Email, Profile.Email),",
 				"          Phone = iif(isNull(Phone), \"000-000-0000\", Phone)) ~> extractingUserData",
 				"extractingUserData select(mapColumn(",
@@ -149,7 +170,7 @@
 				"          primaryEmail = Email",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> renameing",
+				"     skipDuplicateMapOutputs: true) ~> renaming",
 				"blobStorage select(mapColumn(",
 				"          customerID = CustomerID,",
 				"          alternativeEmail = Email",
@@ -179,7 +200,23 @@
 				"          timeStamp = Conversations[1].Messages[1].DateTime",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> selectConversations"
+				"     skipDuplicateMapOutputs: true) ~> selectConversations",
+				"renaming sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          order_id as integer,",
+				"          customer_id as integer,",
+				"          payment_status as string,",
+				"          order_date as timestamp,",
+				"          order_total as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> customerInfoSink"
 			]
 		}
 	}
