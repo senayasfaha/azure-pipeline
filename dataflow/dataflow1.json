@@ -26,15 +26,11 @@
 					"name": "realisticustomers"
 				},
 				{
-					"dataset": {
-						"referenceName": "AzurePostgreSqlTable1",
-						"type": "DatasetReference"
-					},
 					"name": "orders"
 				},
 				{
 					"dataset": {
-						"referenceName": "AzurePostgreSqlTable2",
+						"referenceName": "orderDetails",
 						"type": "DatasetReference"
 					},
 					"name": "orderdetail"
@@ -70,6 +66,9 @@
 				},
 				{
 					"name": "orderSelect"
+				},
+				{
+					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -100,16 +99,8 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'document') ~> realisticustomers",
-				"source(output(",
-				"          orderid as integer,",
-				"          customerid as integer,",
-				"          orderdate as timestamp,",
-				"          paymentstatus as string",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> orders",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> orders",
 				"source(output(",
 				"          orderdetailid as integer,",
 				"          orderid as integer,",
@@ -134,8 +125,8 @@
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinHitoricalAndCurrentDate",
 				"joinHitoricalAndCurrentDate derive(CustomerID = iif(isNull(realisticustomers@CustomerID), select1@CustomerID, realisticustomers@CustomerID),",
-				"          Name = iif(isNull(Profile.FirstName), Name, Profile.FirstName) ,",
-				"          Profile = iif(isNull(Profile.LastName), Name, Profile.LastName) ,",
+				"          Name = iif(isNull(Profile.FirstName), Name, Profile.FirstName),",
+				"          Profile = iif(isNull(Profile.LastName), Name, Profile.LastName),",
 				"          Email = iif(isNull(Profile.Email), Email, Profile.Email),",
 				"          Phone = iif(isNull(Phone), \"000-000-0000\", Phone)) ~> extractingUserData",
 				"extractingUserData select(mapColumn(",
@@ -165,13 +156,22 @@
 				"          date = orderdate,",
 				"          paymentStatus = paymentstatus,",
 				"          orderdetailid,",
-				"          orderid = orderdetail@orderid,",
+				"          orderid,",
 				"          productid,",
 				"          quantity,",
 				"          price",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> orderSelect"
+				"     skipDuplicateMapOutputs: true) ~> orderSelect",
+				"realisticustomers select(mapColumn(",
+				"          CustomerID,",
+				"          converstationId = Conversations[1].ConversationID,",
+				"          messageSender = Conversations[1].Messages[1].Sender,",
+				"          Message = Conversations[1].Messages[1].Message,",
+				"          timeStamp = Conversations[1].Messages[1].DateTime",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1"
 			]
 		}
 	}

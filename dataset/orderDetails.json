@@ -1,5 +1,5 @@
 {
-	"name": "AzurePostgreSqlTable2",
+	"name": "orderDetails",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "clusterforpg",
