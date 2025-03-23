@@ -130,6 +130,9 @@
 				},
 				{
 					"name": "convertCustomerIdToInt"
+				},
+				{
+					"name": "ConversationIdToInt"
 				}
 			],
 			"scriptLines": [
@@ -240,7 +243,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> orderSelect",
-				"realisticustomers select(mapColumn(",
+				"ConversationIdToInt select(mapColumn(",
 				"          CustomerID,",
 				"          converstationId = Conversations[1].ConversationID,",
 				"          messageSender = Conversations[1].Messages[1].Sender,",
@@ -261,6 +264,7 @@
 				"select1 alterRow(upsertIf(true())) ~> AlterRow4",
 				"fetchingAlternativeEmailInfo alterRow(upsertIf(true())) ~> AlterRow5",
 				"blobStorage derive(CustomerID = toInteger(CustomerID)) ~> convertCustomerIdToInt",
+				"realisticustomers derive(Conversations = toInteger(Conversations.ConversationID)) ~> ConversationIdToInt",
 				"AlterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -334,7 +338,11 @@
 				"     keys:['CustomerID'],",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> conversationInfo",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          conversation_id = converstationId,",
+				"          customer_id = CustomerID",
+				"     )) ~> conversationInfo",
 				"AlterRow3 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -352,7 +360,14 @@
 				"     keys:['CustomerID'],",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> messageInfo"
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          message_id = CustomerID,",
+				"          conversation_id = converstationId,",
+				"          message_sender = messageSender,",
+				"          message = Message,",
+				"          timestamp = timeStamp",
+				"     )) ~> messageInfo"
 			]
 		}
 	}
