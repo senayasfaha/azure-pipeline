@@ -1,0 +1,45 @@
+{
+	"name": "conversationMessage",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SqlServer",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "message_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "conversation_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "support_agent",
+				"type": "varchar"
+			},
+			{
+				"name": "message_sender",
+				"type": "varchar"
+			},
+			{
+				"name": "message",
+				"type": "text"
+			},
+			{
+				"name": "timestamp",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "conversation_messages"
+		}
+	}
+}
