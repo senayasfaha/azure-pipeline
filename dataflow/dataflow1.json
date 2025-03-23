@@ -127,6 +127,9 @@
 				},
 				{
 					"name": "AlterRow5"
+				},
+				{
+					"name": "convertCustomerIdToInt"
 				}
 			],
 			"scriptLines": [
@@ -197,8 +200,7 @@
 				"  isNull(Profile.FirstName),",
 				"  split(Name, ' ')[0],",
 				"  Profile.FirstName",
-				")",
-				",",
+				"),",
 				"          Profile = /* iif(isNull(Profile.LastName), Name, Profile.LastName) */",
 				"",
 				"iif(",
@@ -217,7 +219,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> renaming",
-				"blobStorage select(mapColumn(",
+				"convertCustomerIdToInt select(mapColumn(",
 				"          customerID = CustomerID,",
 				"          alternativeEmail = Email",
 				"     ),",
@@ -258,6 +260,7 @@
 				"selectConversations alterRow(upsertIf(true())) ~> AlterRow3",
 				"select1 alterRow(upsertIf(true())) ~> AlterRow4",
 				"fetchingAlternativeEmailInfo alterRow(upsertIf(true())) ~> AlterRow5",
+				"blobStorage derive(CustomerID = toInteger(CustomerID)) ~> convertCustomerIdToInt",
 				"AlterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -303,10 +306,14 @@
 				"     insertable:false,",
 				"     updateable:false,",
 				"     upsertable:true,",
-				"     keys:['customerID'],",
+				"     keys:['customer_id'],",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> alternativeEmailSink",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          customer_id = customerID,",
+				"          email_address = alternativeEmail",
+				"     )) ~> alternativeEmailSink",
 				"AlterRow4 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
