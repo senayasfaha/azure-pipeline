@@ -57,6 +57,60 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow1",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"blobStorage": {},
+									"productNoSql": {},
+									"realisticustomers": {},
+									"orders": {},
+									"orderdetail": {},
+									"customerInfoSink": {},
+									"orderSink": {},
+									"alternativeEmailSink": {},
+									"conversationInfo": {},
+									"messageInfo": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dataflow1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AzurePostgreSqlTable1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -818,6 +872,9 @@
 						},
 						{
 							"name": "ConversationIdToInt"
+						},
+						{
+							"name": "flattenUserInfo"
 						}
 					],
 					"scriptLines": [
@@ -930,10 +987,10 @@
 						"     skipDuplicateMapOutputs: true) ~> orderSelect",
 						"ConversationIdToInt select(mapColumn(",
 						"          CustomerID,",
-						"          converstationId = Conversations[1].ConversationID,",
-						"          messageSender = Conversations[1].Messages[1].Sender,",
-						"          Message = Conversations[1].Messages[1].Message,",
-						"          timeStamp = Conversations[1].Messages[1].DateTime",
+						"          converstationId = ConversationID,",
+						"          messageSender = Sender,",
+						"          Message,",
+						"          timeStamp = DateTime",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> selectConversations",
@@ -949,7 +1006,20 @@
 						"select1 alterRow(upsertIf(true())) ~> AlterRow4",
 						"fetchingAlternativeEmailInfo alterRow(upsertIf(true())) ~> AlterRow5",
 						"blobStorage derive(CustomerID = toInteger(CustomerID)) ~> convertCustomerIdToInt",
-						"realisticustomers derive(Conversations = toInteger(Conversations.ConversationID)) ~> ConversationIdToInt",
+						"flattenUserInfo derive(Conversations = toInteger(ConversationID)) ~> ConversationIdToInt",
+						"realisticustomers foldDown(unroll(Conversations, Conversations),",
+						"     mapColumn(",
+						"          CustomerID,",
+						"          FirstName = Profile.FirstName,",
+						"          LastName = Profile.LastName,",
+						"          Email = Profile.Email,",
+						"          ConversationID = Conversations.ConversationID,",
+						"          DateTime = Conversations.Messages.DateTime,",
+						"          Sender = Conversations.Messages.Sender,",
+						"          Message = Conversations.Messages.Message",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flattenUserInfo",
 						"AlterRow1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
@@ -1074,60 +1144,6 @@
 				"[concat(variables('factoryId'), '/datasets/SqlServerTable4')]",
 				"[concat(variables('factoryId'), '/datasets/convo')]",
 				"[concat(variables('factoryId'), '/datasets/SqlServerTable5')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "dataflow1",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "dataflow1",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"blobStorage": {},
-									"productNoSql": {},
-									"realisticustomers": {},
-									"orders": {},
-									"orderdetail": {},
-									"customerInfoSink": {},
-									"orderSink": {},
-									"alternativeEmailSink": {},
-									"conversationInfo": {},
-									"messageInfo": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/dataflow1')]"
 			]
 		}
 	]
