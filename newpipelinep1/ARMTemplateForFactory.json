@@ -81,7 +81,6 @@
 								"parameters": {},
 								"datasetParameters": {
 									"blobStorage": {},
-									"productNoSql": {},
 									"realisticustomers": {},
 									"orders": {},
 									"orderdetail": {},
@@ -515,6 +514,124 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/alternateEmail')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "alternate_email_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "customer_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "email_address",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "alternateEmail"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SqlServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/conversation')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "conversation_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "customer_id",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "conversations"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SqlServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/conversationMessage')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "message_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "conversation_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "support_agent",
+						"type": "varchar"
+					},
+					{
+						"name": "message_sender",
+						"type": "varchar"
+					},
+					{
+						"name": "message",
+						"type": "text"
+					},
+					{
+						"name": "timestamp",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "conversation_messages"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SqlServer')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/convo')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -600,6 +717,49 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/customerTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "customer_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "first_name",
+						"type": "varchar"
+					},
+					{
+						"name": "last_name",
+						"type": "varchar"
+					},
+					{
+						"name": "primary_email_address",
+						"type": "varchar"
+					},
+					{
+						"name": "phone_number",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "customer"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SqlServer')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/orderDetails')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -649,6 +809,54 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/clusterforpg')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/orders')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "order_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "customer_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "payment_status",
+						"type": "varchar"
+					},
+					{
+						"name": "order_date",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "order_total",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "orders"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SqlServer')]"
 			]
 		},
 		{
@@ -752,13 +960,6 @@
 						},
 						{
 							"dataset": {
-								"referenceName": "CosmosDbNoSqlContainer2",
-								"type": "DatasetReference"
-							},
-							"name": "productNoSql"
-						},
-						{
-							"dataset": {
 								"referenceName": "NoSqlrealistic_customers",
 								"type": "DatasetReference"
 							},
@@ -782,35 +983,35 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "SqlServerTable3",
+								"referenceName": "customerTable",
 								"type": "DatasetReference"
 							},
 							"name": "customerInfoSink"
 						},
 						{
 							"dataset": {
-								"referenceName": "SqlServerTable2",
+								"referenceName": "orders",
 								"type": "DatasetReference"
 							},
 							"name": "orderSink"
 						},
 						{
 							"dataset": {
-								"referenceName": "SqlServerTable4",
+								"referenceName": "alternateEmail",
 								"type": "DatasetReference"
 							},
 							"name": "alternativeEmailSink"
 						},
 						{
 							"dataset": {
-								"referenceName": "convo",
+								"referenceName": "conversation",
 								"type": "DatasetReference"
 							},
 							"name": "conversationInfo"
 						},
 						{
 							"dataset": {
-								"referenceName": "SqlServerTable5",
+								"referenceName": "conversationMessage",
 								"type": "DatasetReference"
 							},
 							"name": "messageInfo"
@@ -892,14 +1093,6 @@
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     ignoreNoFilesFound: false) ~> blobStorage",
-						"source(output(",
-						"          ProductID as integer,",
-						"          ProductName as string,",
-						"          Price as double",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     format: 'document') ~> productNoSql",
 						"source(output(",
 						"          CustomerID as integer,",
 						"          Profile as (FirstName as string, LastName as string, Email as string),",
@@ -1039,21 +1232,22 @@
 						"          customer_id as integer,",
 						"          first_name as string,",
 						"          last_name as string,",
-						"          primary_email as string,",
+						"          primary_email_address as string,",
 						"          phone_number as string",
 						"     ),",
 						"     deletable:false,",
 						"     insertable:false,",
 						"     updateable:false,",
 						"     upsertable:true,",
-						"     keys:['first_name'],",
+						"     keys:['customer_id'],",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
 						"     mapColumn(",
+						"          customer_id = CustomerID,",
 						"          first_name = firstNmae,",
 						"          last_name = lastname,",
-						"          primary_email = primaryEmail,",
+						"          primary_email_address = primaryEmail,",
 						"          phone_number = phoneNumber",
 						"     )) ~> customerInfoSink",
 						"AlterRow2 sink(allowSchemaDrift: true,",
@@ -1063,7 +1257,7 @@
 						"          customer_id as integer,",
 						"          payment_status as string,",
 						"          order_date as timestamp,",
-						"          order_total as integer",
+						"          order_total as decimal(10,2)",
 						"     ),",
 						"     deletable:false,",
 						"     insertable:false,",
@@ -1108,13 +1302,13 @@
 						"     insertable:false,",
 						"     updateable:false,",
 						"     upsertable:true,",
-						"     keys:['conversation_id'],",
+						"     keys:['customer_id'],",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
 						"     mapColumn(",
-						"          conversation_id = converstationId,",
-						"          customer_id = CustomerID",
+						"          customer_id = CustomerID,",
+						"          conversation_id = converstationId",
 						"     )) ~> conversationInfo",
 						"AlterRow3 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
@@ -1130,11 +1324,12 @@
 						"     insertable:false,",
 						"     updateable:false,",
 						"     upsertable:true,",
-						"     keys:['message'],",
+						"     keys:['message_id'],",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
 						"     mapColumn(",
+						"          message_id = CustomerID,",
 						"          conversation_id = converstationId,",
 						"          message_sender = messageSender,",
 						"          message = Message,",
@@ -1145,15 +1340,14 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/csv')]",
-				"[concat(variables('factoryId'), '/datasets/CosmosDbNoSqlContainer2')]",
 				"[concat(variables('factoryId'), '/datasets/NoSqlrealistic_customers')]",
 				"[concat(variables('factoryId'), '/datasets/AzurePostgreSqlTable1')]",
 				"[concat(variables('factoryId'), '/datasets/orderDetails')]",
-				"[concat(variables('factoryId'), '/datasets/SqlServerTable3')]",
-				"[concat(variables('factoryId'), '/datasets/SqlServerTable2')]",
-				"[concat(variables('factoryId'), '/datasets/SqlServerTable4')]",
-				"[concat(variables('factoryId'), '/datasets/convo')]",
-				"[concat(variables('factoryId'), '/datasets/SqlServerTable5')]"
+				"[concat(variables('factoryId'), '/datasets/customerTable')]",
+				"[concat(variables('factoryId'), '/datasets/orders')]",
+				"[concat(variables('factoryId'), '/datasets/alternateEmail')]",
+				"[concat(variables('factoryId'), '/datasets/conversation')]",
+				"[concat(variables('factoryId'), '/datasets/conversationMessage')]"
 			]
 		}
 	]

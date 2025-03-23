@@ -545,6 +545,124 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/alternateEmail')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "alternate_email_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "customer_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "email_address",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "alternateEmail"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SqlServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/conversation')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "conversation_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "customer_id",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "conversations"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SqlServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/conversationMessage')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "message_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "conversation_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "support_agent",
+						"type": "varchar"
+					},
+					{
+						"name": "message_sender",
+						"type": "varchar"
+					},
+					{
+						"name": "message",
+						"type": "text"
+					},
+					{
+						"name": "timestamp",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "conversation_messages"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SqlServer')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/convo')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -630,530 +748,46 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/orderDetails')]",
+			"name": "[concat(parameters('factoryName'), '/customerTable')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "clusterforpg",
+					"referenceName": "SqlServer",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"type": "AzurePostgreSqlTable",
+				"type": "SqlServerTable",
 				"schema": [
 					{
-						"name": "orderdetailid",
-						"type": "integer",
-						"precision": 0,
-						"scale": 0
+						"name": "customer_id",
+						"type": "int",
+						"precision": 10
 					},
 					{
-						"name": "orderid",
-						"type": "integer",
-						"precision": 0,
-						"scale": 0
+						"name": "first_name",
+						"type": "varchar"
 					},
 					{
-						"name": "productid",
-						"type": "integer",
-						"precision": 0,
-						"scale": 0
+						"name": "last_name",
+						"type": "varchar"
 					},
 					{
-						"name": "quantity",
-						"type": "integer",
-						"precision": 0,
-						"scale": 0
+						"name": "primary_email_address",
+						"type": "varchar"
 					},
 					{
-						"name": "price",
-						"type": "numeric",
-						"precision": 10,
-						"scale": 2
+						"name": "phone_number",
+						"type": "varchar"
 					}
 				],
 				"typeProperties": {
-					"schema": "public",
-					"table": "orderdetails"
+					"schema": "dbo",
+					"table": "customer"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/clusterforpg')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "csv",
-								"type": "DatasetReference"
-							},
-							"name": "blobStorage"
-						},
-						{
-							"dataset": {
-								"referenceName": "CosmosDbNoSqlContainer2",
-								"type": "DatasetReference"
-							},
-							"name": "productNoSql"
-						},
-						{
-							"dataset": {
-								"referenceName": "NoSqlrealistic_customers",
-								"type": "DatasetReference"
-							},
-							"name": "realisticustomers"
-						},
-						{
-							"dataset": {
-								"referenceName": "AzurePostgreSqlTable1",
-								"type": "DatasetReference"
-							},
-							"name": "orders"
-						},
-						{
-							"dataset": {
-								"referenceName": "orderDetails",
-								"type": "DatasetReference"
-							},
-							"name": "orderdetail"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "SqlServerTable3",
-								"type": "DatasetReference"
-							},
-							"name": "customerInfoSink"
-						},
-						{
-							"dataset": {
-								"referenceName": "SqlServerTable2",
-								"type": "DatasetReference"
-							},
-							"name": "orderSink"
-						},
-						{
-							"dataset": {
-								"referenceName": "SqlServerTable4",
-								"type": "DatasetReference"
-							},
-							"name": "alternativeEmailSink"
-						},
-						{
-							"dataset": {
-								"referenceName": "convo",
-								"type": "DatasetReference"
-							},
-							"name": "conversationInfo"
-						},
-						{
-							"dataset": {
-								"referenceName": "SqlServerTable5",
-								"type": "DatasetReference"
-							},
-							"name": "messageInfo"
-						}
-					],
-					"transformations": [
-						{
-							"name": "phoneNumberCleaning",
-							"description": "Creating new column with formatted phone number"
-						},
-						{
-							"name": "phoneNumber",
-							"description": "Creating new column with formatted phone number"
-						},
-						{
-							"name": "joinHitoricalAndCurrentDate"
-						},
-						{
-							"name": "extractingUserData"
-						},
-						{
-							"name": "renaming"
-						},
-						{
-							"name": "fetchingAlternativeEmailInfo"
-						},
-						{
-							"name": "orderJoin"
-						},
-						{
-							"name": "CalculatingOrderTotal"
-						},
-						{
-							"name": "orderSelect"
-						},
-						{
-							"name": "selectConversations"
-						},
-						{
-							"name": "select1"
-						},
-						{
-							"name": "AlterRow1"
-						},
-						{
-							"name": "AlterRow2"
-						},
-						{
-							"name": "AlterRow3"
-						},
-						{
-							"name": "AlterRow4"
-						},
-						{
-							"name": "AlterRow5"
-						},
-						{
-							"name": "convertCustomerIdToInt"
-						},
-						{
-							"name": "ConversationIdToInt"
-						},
-						{
-							"name": "flattenUserInfo"
-						},
-						{
-							"name": "flattenMessage"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          CustomerID as string,",
-						"          Name as string,",
-						"          Email as string,",
-						"          Phone as string,",
-						"          LastPurchaseDate as string,",
-						"          TotalSpent as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> blobStorage",
-						"source(output(",
-						"          ProductID as integer,",
-						"          ProductName as string,",
-						"          Price as double",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     format: 'document') ~> productNoSql",
-						"source(output(",
-						"          CustomerID as integer,",
-						"          Profile as (FirstName as string, LastName as string, Email as string),",
-						"          Conversations as (ConversationID as string, Messages as (DateTime as string, Sender as string, Message as string)[])[]",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     format: 'document') ~> realisticustomers",
-						"source(output(",
-						"          orderid as integer,",
-						"          customerid as integer,",
-						"          orderdate as timestamp,",
-						"          paymentstatus as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> orders",
-						"source(output(",
-						"          orderdetailid as integer,",
-						"          orderid as integer,",
-						"          productid as integer,",
-						"          quantity as integer,",
-						"          price as decimal(10,2)",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> orderdetail",
-						"blobStorage derive(Phone = iif(",
-						"    length(replace(replace(replace(replace(Phone, \"(\", \"\"), \")\", \"\"), \"-\", \"\"), \" \", \"\")) == 10, ",
-						"    replace(replace(replace(replace(Phone, \"(\", \"\"), \")\", \"\"), \"-\", \"\"), \" \", \"\"), ",
-						"    ''",
-						")) ~> phoneNumberCleaning",
-						"phoneNumberCleaning derive(Phone = \"(\" + substring(Phone, 0, 3) + \") \" + substring(Phone, 3, 3) + \"-\" + substring(Phone, 6, 4),",
-						"          CustomerID = toInteger(CustomerID)) ~> phoneNumber",
-						"phoneNumber, realisticustomers join(phoneNumber@CustomerID == realisticustomers@CustomerID,",
-						"     joinType:'outer',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> joinHitoricalAndCurrentDate",
-						"joinHitoricalAndCurrentDate derive(CustomerID = iif(isNull(realisticustomers@CustomerID), phoneNumber@CustomerID, realisticustomers@CustomerID),",
-						"          Name = /* iif(isNull(Profile.FirstName), Name, Profile.FirstName) */",
-						"",
-						"iif(",
-						"  isNull(Profile.FirstName),",
-						"  split(Name, ' ')[0],",
-						"  Profile.FirstName",
-						"),",
-						"          Profile = /* iif(isNull(Profile.LastName), Name, Profile.LastName) */",
-						"",
-						"iif(",
-						"  isNull(Profile.LastName),",
-						"  split(Name, ' ')[0],",
-						"  Profile.LastName",
-						"),",
-						"          Email = iif(isNull(Profile.Email), Email, Profile.Email),",
-						"          Phone = iif(isNull(Phone), \"000-000-0000\", Phone)) ~> extractingUserData",
-						"extractingUserData select(mapColumn(",
-						"          CustomerID,",
-						"          firstNmae = Name,",
-						"          lastname = Profile,",
-						"          phoneNumber = Phone,",
-						"          primaryEmail = Email",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> renaming",
-						"convertCustomerIdToInt select(mapColumn(",
-						"          customerID = CustomerID,",
-						"          alternativeEmail = Email",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> fetchingAlternativeEmailInfo",
-						"orders, orderdetail join(orders@orderid == orderdetail@orderid,",
-						"     joinType:'outer',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> orderJoin",
-						"orderJoin derive(price = toInteger(price*quantity)) ~> CalculatingOrderTotal",
-						"CalculatingOrderTotal select(mapColumn(",
-						"          customerId = customerid,",
-						"          orderTotal = price,",
-						"          date = orderdate,",
-						"          paymentStatus = paymentstatus",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> orderSelect",
-						"ConversationIdToInt select(mapColumn(",
-						"          CustomerID,",
-						"          converstationId = ConversationID,",
-						"          messageSender = Sender,",
-						"          Message,",
-						"          timeStamp = DateTime",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> selectConversations",
-						"selectConversations select(mapColumn(",
-						"          CustomerID,",
-						"          converstationId",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select1",
-						"renaming alterRow(upsertIf(true())) ~> AlterRow1",
-						"orderSelect alterRow(upsertIf(true())) ~> AlterRow2",
-						"selectConversations alterRow(upsertIf(true())) ~> AlterRow3",
-						"select1 alterRow(upsertIf(true())) ~> AlterRow4",
-						"fetchingAlternativeEmailInfo alterRow(upsertIf(true())) ~> AlterRow5",
-						"blobStorage derive(CustomerID = toInteger(CustomerID)) ~> convertCustomerIdToInt",
-						"flattenMessage derive(Conversations = toInteger(ConversationID)) ~> ConversationIdToInt",
-						"realisticustomers foldDown(unroll(Conversations, Conversations),",
-						"     mapColumn(",
-						"          CustomerID,",
-						"          FirstName = Profile.FirstName,",
-						"          LastName = Profile.LastName,",
-						"          Email = Profile.Email,",
-						"          ConversationID = Conversations.ConversationID,",
-						"          DateTime = Conversations.Messages",
-						"     ),",
-						"     skipDuplicateMapInputs: false,",
-						"     skipDuplicateMapOutputs: false) ~> flattenUserInfo",
-						"flattenUserInfo foldDown(unroll(DateTime),",
-						"     mapColumn(",
-						"          CustomerID,",
-						"          FirstName,",
-						"          LastName,",
-						"          Email,",
-						"          ConversationID,",
-						"          DateTime = DateTime.DateTime,",
-						"          Sender = DateTime.Sender,",
-						"          Message = DateTime.Message",
-						"     ),",
-						"     skipDuplicateMapInputs: false,",
-						"     skipDuplicateMapOutputs: false) ~> flattenMessage",
-						"AlterRow1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          customer_id as integer,",
-						"          first_name as string,",
-						"          last_name as string,",
-						"          primary_email as string,",
-						"          phone_number as string",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:false,",
-						"     updateable:false,",
-						"     upsertable:true,",
-						"     keys:['first_name'],",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     mapColumn(",
-						"          first_name = firstNmae,",
-						"          last_name = lastname,",
-						"          primary_email = primaryEmail,",
-						"          phone_number = phoneNumber",
-						"     )) ~> customerInfoSink",
-						"AlterRow2 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          order_id as integer,",
-						"          customer_id as integer,",
-						"          payment_status as string,",
-						"          order_date as timestamp,",
-						"          order_total as integer",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:false,",
-						"     updateable:false,",
-						"     upsertable:true,",
-						"     keys:['customer_id'],",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     mapColumn(",
-						"          customer_id = customerId,",
-						"          payment_status = paymentStatus,",
-						"          order_date = date,",
-						"          order_total = orderTotal",
-						"     )) ~> orderSink",
-						"AlterRow5 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          alternate_email_id as integer,",
-						"          customer_id as integer,",
-						"          email_address as string",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:false,",
-						"     updateable:false,",
-						"     upsertable:true,",
-						"     keys:['customer_id'],",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     mapColumn(",
-						"          customer_id = customerID,",
-						"          email_address = alternativeEmail",
-						"     )) ~> alternativeEmailSink",
-						"AlterRow4 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          conversation_id as integer,",
-						"          customer_id as integer",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:false,",
-						"     updateable:false,",
-						"     upsertable:true,",
-						"     keys:['conversation_id'],",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     mapColumn(",
-						"          conversation_id = converstationId,",
-						"          customer_id = CustomerID",
-						"     )) ~> conversationInfo",
-						"AlterRow3 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          message_id as integer,",
-						"          conversation_id as integer,",
-						"          support_agent as string,",
-						"          message_sender as string,",
-						"          message as string,",
-						"          timestamp as timestamp",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:false,",
-						"     updateable:false,",
-						"     upsertable:true,",
-						"     keys:['message'],",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     mapColumn(",
-						"          conversation_id = converstationId,",
-						"          message_sender = messageSender,",
-						"          message = Message,",
-						"          timestamp = timeStamp",
-						"     )) ~> messageInfo"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/csv')]",
-				"[concat(variables('factoryId'), '/datasets/CosmosDbNoSqlContainer2')]",
-				"[concat(variables('factoryId'), '/datasets/NoSqlrealistic_customers')]",
-				"[concat(variables('factoryId'), '/datasets/AzurePostgreSqlTable1')]",
-				"[concat(variables('factoryId'), '/datasets/orderDetails')]",
-				"[concat(variables('factoryId'), '/datasets/SqlServerTable3')]",
-				"[concat(variables('factoryId'), '/datasets/SqlServerTable2')]",
-				"[concat(variables('factoryId'), '/datasets/SqlServerTable4')]",
-				"[concat(variables('factoryId'), '/datasets/convo')]",
-				"[concat(variables('factoryId'), '/datasets/SqlServerTable5')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "dataflow1",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "dataflow1",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"blobStorage": {},
-									"productNoSql": {},
-									"realisticustomers": {},
-									"orders": {},
-									"orderdetail": {},
-									"customerInfoSink": {},
-									"orderSink": {},
-									"alternativeEmailSink": {},
-									"conversationInfo": {},
-									"messageInfo": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/dataflow1')]"
+				"[concat(variables('factoryId'), '/linkedServices/SqlServer')]"
 			]
 		}
 	]
