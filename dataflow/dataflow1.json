@@ -136,6 +136,9 @@
 				},
 				{
 					"name": "flattenUserInfo"
+				},
+				{
+					"name": "flattenMessage"
 				}
 			],
 			"scriptLines": [
@@ -267,7 +270,7 @@
 				"select1 alterRow(upsertIf(true())) ~> AlterRow4",
 				"fetchingAlternativeEmailInfo alterRow(upsertIf(true())) ~> AlterRow5",
 				"blobStorage derive(CustomerID = toInteger(CustomerID)) ~> convertCustomerIdToInt",
-				"flattenUserInfo derive(Conversations = toInteger(ConversationID)) ~> ConversationIdToInt",
+				"flattenMessage derive(Conversations = toInteger(ConversationID)) ~> ConversationIdToInt",
 				"realisticustomers foldDown(unroll(Conversations, Conversations),",
 				"     mapColumn(",
 				"          CustomerID,",
@@ -275,12 +278,23 @@
 				"          LastName = Profile.LastName,",
 				"          Email = Profile.Email,",
 				"          ConversationID = Conversations.ConversationID,",
-				"          DateTime = Conversations.Messages.DateTime,",
-				"          Sender = Conversations.Messages.Sender,",
-				"          Message = Conversations.Messages.Message",
+				"          DateTime = Conversations.Messages",
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> flattenUserInfo",
+				"flattenUserInfo foldDown(unroll(DateTime),",
+				"     mapColumn(",
+				"          CustomerID,",
+				"          FirstName,",
+				"          LastName,",
+				"          Email,",
+				"          ConversationID,",
+				"          DateTime = DateTime.DateTime,",
+				"          Sender = DateTime.Sender,",
+				"          Message = DateTime.Message",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flattenMessage",
 				"AlterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
